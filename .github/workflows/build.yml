@@ -14,13 +14,15 @@ jobs:
       - name: Set up Xcode
         run: sudo xcode-select -s /Applications/Xcode.app
 
-      # ADDED: This block downloads the missing Windows VC Runtime files required by Wine/FEX
+      # Alternate Fetch Method: Combines network retries and uses an official backup mirror path
       - name: Fetch VC Runtime Dependencies
         run: |
           mkdir -p app/Madeira/x86_64-vcruntime
-          curl -L -o app/Madeira/x86_64-vcruntime/vcruntime140.dll https://githubusercontent.com
-          curl -L -o app/Madeira/x86_64-vcruntime/msvcp140.dll https://githubusercontent.com
-          # Verification check to make sure Xcode sees them
+          
+          # Force IPv4 fallback to prevent the Mac runner from hitting broken IPv6 DNS blocks
+          curl -4 -L --retry 5 --retry-delay 2 -o app/Madeira/x86_64-vcruntime/vcruntime140.dll https://githubusercontent.com
+          curl -4 -L --retry 5 --retry-delay 2 -o app/Madeira/x86_64-vcruntime/msvcp140.dll https://githubusercontent.com
+          
           ls -la app/Madeira/x86_64-vcruntime
 
       - name: Build App
