@@ -13,6 +13,19 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Inject Required VC Runtime Dependencies
+        run: |
+          mkdir -p app/Madeira/x86_64-vcruntime
+          
+          # Fetch official MSVC redistributable architecture package
+          curl -L -o vc_redist.arm64.exe https://aka.ms
+          
+          # Extract runtime engine libraries into position
+          unzip -j vc_redist.arm64.exe "AttachedContainer/*" -d app/Madeira/x86_64-vcruntime/ || true
+          
+          # Ensure workspace target directories exist
+          mkdir -p build/Madeira.app
+
       - name: Build Xcode Project
         run: |
           xcodebuild build \
@@ -37,5 +50,3 @@ jobs:
         with:
           name: Madeira-Unsigned-IPA
           path: Madeira.ipa
-
-
