@@ -13,11 +13,6 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Debug Folder Structure
-        run: |
-          ls -la
-          find . -maxdepth 3 -type d
-
       - name: Build Xcode Project
         run: |
           xcodebuild build \
@@ -42,4 +37,5 @@ jobs:
         with:
           name: Madeira-Unsigned-IPA
           path: Madeira.ipa
+
 
