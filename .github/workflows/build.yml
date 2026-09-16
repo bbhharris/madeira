@@ -1,34 +1,39 @@
-name: Build iOS IPA
+name: Build Unsigned IPA
+
 on:
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-14
+
     steps:
-      - name: Checkout Repository
+      - name: Checkout Source Code
         uses: actions/checkout@v4
         with:
-          submodules: 'recursive'
+          submodules: recursive
 
-      - name: Set up Xcode
-        run: sudo xcode-select -s /Applications/Xcode.app
-
-      - name: Verify VC Runtime Files Exist
-        run: ls -la app/Madeira/x86_64-vcruntime
-
-      - name: Build App
+      - name: Build Xcode Project
         run: |
-          xcodebuild -project app/Madeira.xcodeproj -scheme Madeira -configuration Release -sdk iphoneos CODE_SIGNING_ALLOWED=NO OBJROOT=$PWD/build SYMROOT=$PWD/build
+          xcodebuild build \
+            -project Madeira.xcodeproj \
+            -scheme Madeira \
+            -configuration Release \
+            -sdk iphoneos \
+            CONFIGURATION_BUILD_DIR=$PWD/build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            PROVISIONING_PROFILE_SPECIFIER=""
 
-      - name: Create IPA Container
+      - name: Package Binary into IPA Format
         run: |
           mkdir -p Payload
-          cp -r build/Release-iphoneos/Madeira.app Payload/
-          zip -r Madeira.ipa Payload/
+          mv build/Madeira.app Payload/
+          zip -r Madeira.ipa Payload
 
-      - name: Upload IPA Artifact
+      - name: Upload Finished IPA Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Madeira-IPA
+          name: Madeira-Unsigned-IPA
           path: Madeira.ipa
