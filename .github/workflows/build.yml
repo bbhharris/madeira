@@ -13,20 +13,9 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Pre-Create VC Runtime Directories
-        run: |
-          # Create the exact missing directory layout required by verification scripts
-          mkdir -p app/Madeira/x86_64-vcruntime
-          
-          # Place a dummy placeholder file so the directory isn't empty
-          touch app/Madeira/x86_64-vcruntime/.keep
-          
-          # Double check locally inside the builder
-          ls -la app/Madeira/x86_64-vcruntime
-
       - name: Verify VC Runtime Files Exist
         run: |
-          echo "Bypassing internal check manually..."
+          echo "Checking directory structure..."
           ls -la app/Madeira/x86_64-vcruntime
 
       - name: Build Xcode Project
@@ -53,3 +42,4 @@ jobs:
         with:
           name: Madeira-Unsigned-IPA
           path: Madeira.ipa
+
